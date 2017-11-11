@@ -105,7 +105,15 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
+)
+
+const (
+	BINARY_BASE      = 2
+	OCTAL_BASE       = 8
+	DECIMAL_BASE     = 10
+	HEXADECIMAL_BASE = 16
 )
 
 // ErrHelp is the error returned if the flag -help is invoked but no such flag is defined.
@@ -192,6 +200,24 @@ func sortFlags(flags map[NormalizedName]*Flag) []*Flag {
 		result[i] = flags[NormalizedName(name)]
 	}
 	return result
+}
+
+// isNumeric return true if the string s can be parsed as a number
+func isNumeric(s string) bool {
+	var err error
+	if _, err = strconv.ParseInt(s, BINARY_BASE, 0); err == nil {
+		return true
+	}
+	if _, err = strconv.ParseInt(s, OCTAL_BASE, 0); err == nil {
+		return true
+	}
+	if _, err = strconv.ParseInt(s, DECIMAL_BASE, 0); err == nil {
+		return true
+	}
+	if _, err = strconv.ParseInt(s, HEXADECIMAL_BASE, 0); err == nil {
+		return true
+	}
+	return false
 }
 
 // SetNormalizeFunc allows you to add a function which can translate flag names.
@@ -1012,7 +1038,7 @@ func (f *FlagSet) parseArgs(args []string, fn parseFunc) (err error) {
 	for len(args) > 0 {
 		s := args[0]
 		args = args[1:]
-		if len(s) == 0 || s[0] != '-' || len(s) == 1 {
+		if len(s) == 0 || s[0] != '-' || len(s) == 1 || isNumeric(s) {
 			if !f.interspersed {
 				f.args = append(f.args, s)
 				f.args = append(f.args, args...)
