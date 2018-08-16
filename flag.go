@@ -214,27 +214,6 @@ func sortFlags(flags map[NormalizedName]*Flag) []*Flag {
 	return result
 }
 
-// isNumeric return true if the string s can be parsed as a number
-func isNumeric(s string) bool {
-	var err error
-	if _, err = strconv.ParseFloat(s, 0); err == nil {
-		return true
-	}
-	if _, err = strconv.ParseInt(s, BINARY_BASE, 0); err == nil {
-		return true
-	}
-	if _, err = strconv.ParseInt(s, OCTAL_BASE, 0); err == nil {
-		return true
-	}
-	if _, err = strconv.ParseInt(s, DECIMAL_BASE, 0); err == nil {
-		return true
-	}
-	if _, err = strconv.ParseInt(s, HEXADECIMAL_BASE, 0); err == nil {
-		return true
-	}
-	return false
-}
-
 // SetNormalizeFunc allows you to add a function which can translate flag names.
 // Flags added to the FlagSet will be translated and then when anything tries to
 // look up the flag that will also be translated. So it would be possible to create
@@ -1101,7 +1080,7 @@ func (f *FlagSet) parseArgs(args []string, fn parseFunc) (err error) {
 	for len(args) > 0 {
 		s := args[0]
 		args = args[1:]
-		if len(s) == 0 || s[0] != '-' || len(s) == 1 || isNumeric(s) {
+		if len(s) == 0 || s[0] != '-' || len(s) == 1 {
 			if !f.interspersed {
 				f.args = append(f.args, s)
 				f.args = append(f.args, args...)
