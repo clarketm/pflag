@@ -217,6 +217,9 @@ func sortFlags(flags map[NormalizedName]*Flag) []*Flag {
 // isNumeric return true if the string s can be parsed as a number
 func isNumeric(s string) bool {
 	var err error
+	if _, err = strconv.ParseFloat(s, 0); err == nil {
+		return true
+	}
 	if _, err = strconv.ParseInt(s, BINARY_BASE, 0); err == nil {
 		return true
 	}
